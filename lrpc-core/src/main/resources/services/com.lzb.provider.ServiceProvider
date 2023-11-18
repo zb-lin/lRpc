@@ -1,0 +1,2 @@
+zk=com.lzb.provider.zk.ZkServiceProviderImpl
+nacos=com.lzb.provider.nacos.NacosServiceProviderImpl

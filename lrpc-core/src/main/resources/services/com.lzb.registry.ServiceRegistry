@@ -1,0 +1,2 @@
+zk=com.lzb.registry.zk.ZkServiceRegistryImpl
+nacos=com.lzb.registry.nacos.NacosServiceRegistryImpl

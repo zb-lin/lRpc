@@ -1,0 +1,2 @@
+zk=com.lzb.registry.zk.ZkServiceDiscoveryImpl
+nacos=com.lzb.registry.nacos.NacosServiceDiscoveryImpl

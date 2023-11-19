@@ -1,9 +1,9 @@
 package com.lzb.remoting.server;
 
-import com.lzb.enums.CompressTypeEnum;
+import com.lzb.enums.CompressEnum;
 import com.lzb.enums.RpcMessageTypeEnum;
 import com.lzb.enums.RpcResponseCodeEnum;
-import com.lzb.enums.SerializationTypeEnum;
+import com.lzb.enums.SerializationEnum;
 import com.lzb.factory.SingletonFactory;
 import com.lzb.remoting.constants.RpcConstants;
 import com.lzb.remoting.dto.RpcMessage;
@@ -35,8 +35,8 @@ public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("Server receives messages: [{}] ", msg);
                 int messageType = ((RpcMessage) msg).getMessageType();
                 RpcMessage rpcMessage = new RpcMessage();
-                rpcMessage.setCodec(SerializationTypeEnum.HESSIAN.getCode());
-                rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
+                rpcMessage.setCodec(SerializationEnum.HESSIAN.getCode());
+                rpcMessage.setCompress(CompressEnum.GZIP.getCode());
                 // 心跳检测
                 if (messageType == RpcMessageTypeEnum.HEARTBEAT_REQUEST_TYPE.getCode()) {
                     rpcMessage.setMessageType(RpcMessageTypeEnum.HEARTBEAT_RESPONSE_TYPE.getCode());

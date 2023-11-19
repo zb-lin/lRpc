@@ -1,9 +1,9 @@
 package com.lzb.remoting.client.netty;
 
 
-import com.lzb.enums.CompressTypeEnum;
+import com.lzb.enums.CompressEnum;
 import com.lzb.enums.RpcMessageTypeEnum;
-import com.lzb.enums.SerializationTypeEnum;
+import com.lzb.enums.SerializationEnum;
 import com.lzb.factory.SingletonFactory;
 import com.lzb.remoting.client.UnprocessedRequests;
 import com.lzb.remoting.constants.RpcConstants;
@@ -64,8 +64,8 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
                 log.info("Heartbeat detection timeout: [{}]", ctx.channel().remoteAddress());
                 Channel channel = nettyRpcClient.getChannel((InetSocketAddress) ctx.channel().remoteAddress());
                 RpcMessage rpcMessage = new RpcMessage();
-                rpcMessage.setCodec(SerializationTypeEnum.PROTOSTUFF.getCode());
-                rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
+                rpcMessage.setCodec(SerializationEnum.PROTOSTUFF.getCode());
+                rpcMessage.setCompress(CompressEnum.GZIP.getCode());
                 rpcMessage.setMessageType(RpcMessageTypeEnum.HEARTBEAT_REQUEST_TYPE.getCode());
                 rpcMessage.setData(RpcConstants.PING);
                 channel.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);

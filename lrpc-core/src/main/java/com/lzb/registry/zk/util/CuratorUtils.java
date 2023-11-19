@@ -1,7 +1,8 @@
 package com.lzb.registry.zk.util;
 
-import com.lzb.enums.RpcConfigEnum;
-import com.lzb.utils.PropertiesFileUtil;
+import com.lzb.config.RpcConfig;
+import com.lzb.exception.RpcException;
+import com.lzb.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -15,7 +16,6 @@ import org.apache.zookeeper.CreateMode;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +32,7 @@ public final class CuratorUtils {
     private static final Map<String, List<String>> SERVICE_ADDRESS_MAP = new ConcurrentHashMap<>();
     private static final Set<String> REGISTERED_PATH_SET = ConcurrentHashMap.newKeySet();
     private static CuratorFramework zkClient;
-    private static final String DEFAULT_ZOOKEEPER_ADDRESS = "39.105.219.181:2181";
+    private static final RpcConfig rpcConfig = RpcConfig.getRpcConfig();
 
     private CuratorUtils() {
     }
@@ -97,8 +97,12 @@ public final class CuratorUtils {
 
     public static CuratorFramework getZkClient() {
         // check if user has set zk address
-        Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
-        String zookeeperAddress = properties != null && properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue()) != null ? properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue()) : DEFAULT_ZOOKEEPER_ADDRESS;
+        String registryHost = rpcConfig.getRegistryHost();
+        String registryPort = rpcConfig.getRegistryPort();
+        if (StringUtil.isBlank(registryHost) || StringUtil.isBlank(registryPort)) {
+            throw new RpcException("registryHost or registryPort is null");
+        }
+        String zookeeperAddress = registryHost + ":" + registryPort;
         // if zkClient has been started, return directly
         if (zkClient != null && zkClient.getState() == CuratorFrameworkState.STARTED) {
             return zkClient;

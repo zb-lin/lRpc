@@ -6,7 +6,7 @@ import com.lzb.exception.RpcException;
 import com.lzb.provider.ServiceProvider;
 import com.lzb.registry.ServiceRegistry;
 import com.lzb.serviceloader.ServiceLoader;
-import com.lzb.threadpool.RpcConfig;
+import com.lzb.config.RpcConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;

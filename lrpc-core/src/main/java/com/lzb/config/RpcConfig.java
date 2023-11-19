@@ -1,4 +1,4 @@
-package com.lzb.threadpool;
+package com.lzb.config;
 
 import com.lzb.enums.*;
 import lombok.Data;
@@ -34,11 +34,11 @@ public class RpcConfig {
     /**
      * 默认 Serialization
      */
-    private static final String DEFAULT_SERIALIZATION_TYPE = SerializationTypeEnum.HESSIAN.getName();
+    private static final String DEFAULT_SERIALIZATION_TYPE = SerializationEnum.HESSIAN.getName();
     /**
      * 默认 Compress
      */
-    private static final String DEFAULT_COMPRESS_TYPE = CompressTypeEnum.GZIP.getName();
+    private static final String DEFAULT_COMPRESS_TYPE = CompressEnum.GZIP.getName();
     /**
      * 默认 LoadBalance
      */
@@ -61,6 +61,6 @@ public class RpcConfig {
     private String serialization;
     private String compress;
     private String loadBalance;
-
-
+    private String registryHost;
+    private String registryPort;
 }

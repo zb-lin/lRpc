@@ -1,9 +1,9 @@
 package com.lzb.remoting.codec;
 
 import com.lzb.compress.Compress;
-import com.lzb.enums.CompressTypeEnum;
+import com.lzb.enums.CompressEnum;
 import com.lzb.enums.RpcMessageTypeEnum;
-import com.lzb.enums.SerializationTypeEnum;
+import com.lzb.enums.SerializationEnum;
 import com.lzb.serviceloader.ServiceLoader;
 import com.lzb.remoting.constants.RpcConstants;
 import com.lzb.remoting.dto.RpcMessage;
@@ -93,12 +93,12 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
             byte[] bs = new byte[bodyLength];
             in.readBytes(bs);
             // decompress the bytes
-            String compressName = CompressTypeEnum.getName(compressType);
+            String compressName = CompressEnum.getName(compressType);
             Compress compress = ServiceLoader.getServiceLoader(Compress.class)
                     .getService(compressName);
             bs = compress.decompress(bs);
             // deserialize the object
-            String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
+            String codecName = SerializationEnum.getName(rpcMessage.getCodec());
             log.info("codec name: [{}] ", codecName);
             Serializer serializer = ServiceLoader.getServiceLoader(Serializer.class)
                     .getService(codecName);

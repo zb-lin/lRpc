@@ -8,7 +8,7 @@ import com.lzb.proxy.RpcClientProxy;
 import com.lzb.registry.nacos.util.NacosUtils;
 import com.lzb.remoting.client.RpcClient;
 import com.lzb.serviceloader.ServiceLoader;
-import com.lzb.threadpool.RpcConfig;
+import com.lzb.config.RpcConfig;
 import com.lzb.threadpool.ThreadPoolFactory;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

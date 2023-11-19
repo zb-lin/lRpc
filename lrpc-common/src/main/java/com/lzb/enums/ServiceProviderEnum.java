@@ -12,4 +12,12 @@ public enum ServiceProviderEnum {
     NACOS("nacos");
 
     private final String name;
+    public static Boolean contains(String value) {
+        for (ServiceProviderEnum v : values()) {
+            if (v.getName().equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

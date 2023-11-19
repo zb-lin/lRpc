@@ -5,7 +5,7 @@ import com.lzb.provider.ServiceProvider;
 import com.lzb.remoting.codec.RpcMessageDecoder;
 import com.lzb.remoting.codec.RpcMessageEncoder;
 import com.lzb.serviceloader.ServiceLoader;
-import com.lzb.threadpool.RpcConfig;
+import com.lzb.config.RpcConfig;
 import com.lzb.threadpool.ThreadPoolFactory;
 import com.lzb.utils.RuntimeUtil;
 import io.netty.bootstrap.ServerBootstrap;

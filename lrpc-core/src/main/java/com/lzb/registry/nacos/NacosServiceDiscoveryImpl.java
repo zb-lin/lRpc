@@ -13,7 +13,7 @@ import com.lzb.registry.nacos.dto.NacosInetAddress;
 import com.lzb.registry.nacos.util.NacosUtils;
 import com.lzb.remoting.dto.RpcRequest;
 import com.lzb.serviceloader.ServiceLoader;
-import com.lzb.threadpool.RpcConfig;
+import com.lzb.config.RpcConfig;
 import com.lzb.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

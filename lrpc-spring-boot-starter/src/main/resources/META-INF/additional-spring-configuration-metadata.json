@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "lrpc.config.rpcClient",
+      "type": "java.lang.String",
+      "defaultValue": "netty"
+    },
+    {
+      "name": "lrpc.config.serviceRegistry",
+      "type": "java.lang.String",
+      "defaultValue": "nacos"
+    },
+    {
+      "name": "lrpc.config.serviceProvider",
+      "type": "java.lang.String",
+      "defaultValue": "nacos"
+    },
+    {
+      "name": "lrpc.config.serviceDiscovery",
+      "type": "java.lang.String",
+      "defaultValue": "nacos"
+    },
+    {
+      "name": "lrpc.config.serialization",
+      "type": "java.lang.String",
+      "defaultValue": "hessian"
+    },
+    {
+      "name": "lrpc.config.compress",
+      "type": "java.lang.String",
+      "defaultValue": "gzip"
+    },
+    {
+      "name": "lrpc.config.loadBalance",
+      "type": "java.lang.String",
+      "defaultValue": "loadBalance"
+    }
+  ]
+}

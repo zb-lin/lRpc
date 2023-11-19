@@ -5,11 +5,13 @@ import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lzb.config.RpcConfig;
 import com.lzb.enums.ServiceProviderEnum;
 import com.lzb.exception.RpcException;
 import com.lzb.provider.ServiceProvider;
 import com.lzb.registry.nacos.dto.NacosInetAddress;
 import com.lzb.serviceloader.ServiceLoader;
+import com.lzb.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -21,7 +23,7 @@ import static com.alibaba.nacos.api.common.Constants.DEFAULT_GROUP;
 
 @Slf4j
 public class NacosUtils {
-    private static final String SERVER_ADDR = "39.105.219.181";
+    private static final RpcConfig rpcConfig = RpcConfig.getRpcConfig();
     private static ConfigService configService;
     private static final ServiceProvider serviceProvider = ServiceLoader.getServiceLoader(ServiceProvider.class).getService(ServiceProviderEnum.NACOS.getName());
     private final static Gson GSON = new Gson();
@@ -34,7 +36,11 @@ public class NacosUtils {
         try {
             // 初始化配置服务，控制台通过示例代码自动获取下面参数
             Properties properties = new Properties();
-            properties.put("serverAddr", SERVER_ADDR);
+            String registryHost = rpcConfig.getRegistryHost();
+            if (StringUtil.isBlank(registryHost)) {
+                throw new RpcException("registryHost is null");
+            }
+            properties.put("serverAddr", registryHost);
             configService = NacosFactory.createConfigService(properties);
             return configService;
         } catch (NacosException e) {

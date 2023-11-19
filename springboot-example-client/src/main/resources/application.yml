@@ -1,0 +1,11 @@
+lrpc:
+  config:
+    rpcClient: netty
+    serviceRegistry: nacos
+    serviceProvider: nacos
+    serviceDiscovery: nacos
+    serialization: hessian
+    compress: gzip
+    loadBalance: loadBalance
+    registryHost: 39.105.219.181
+

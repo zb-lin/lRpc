@@ -7,23 +7,18 @@ import com.lzb.exception.SerializeException;
 import com.lzb.remoting.dto.RpcRequest;
 import com.lzb.remoting.dto.RpcResponse;
 import com.lzb.serialize.Serializer;
+import com.lzb.serialize.hessian.HessianSerializer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
-/**
- * Kryo serialization class, Kryo serialization efficiency is very high, but only compatible with Java language
- *
- * @author shuang.kou
- * @createTime 2020年05月13日 19:29:00
- */
+
 @Slf4j
 public class KryoSerializer implements Serializer {
 
-    /**
-     * Because Kryo is not thread safe. So, use ThreadLocal to store Kryo objects
-     */
+
     private final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.register(RpcResponse.class);
@@ -32,12 +27,11 @@ public class KryoSerializer implements Serializer {
     });
 
     @Override
-    public byte[] serialize(Object obj) {
+    public byte[] serialize(Object target) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
              Output output = new Output(byteArrayOutputStream)) {
             Kryo kryo = kryoThreadLocal.get();
-            // Object->byte:将对象序列化为byte数组
-            kryo.writeObject(output, obj);
+            kryo.writeObject(output, target);
             kryoThreadLocal.remove();
             return output.toBytes();
         } catch (Exception e) {
@@ -46,17 +40,25 @@ public class KryoSerializer implements Serializer {
     }
 
     @Override
-    public <T> T deserialize(byte[] bytes, Class<T> clazz) {
+    public <T> T deserialize(byte[] bytes, Class<T> targetClass) {
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
              Input input = new Input(byteArrayInputStream)) {
             Kryo kryo = kryoThreadLocal.get();
-            // byte->Object:从byte数组中反序列化出对对象
-            Object o = kryo.readObject(input, clazz);
+            Object result = kryo.readObject(input, targetClass);
             kryoThreadLocal.remove();
-            return clazz.cast(o);
+            return targetClass.cast(result);
         } catch (Exception e) {
             throw new SerializeException("Deserialization failed");
         }
     }
-
+    public static void main(String[] args) {
+        KryoSerializer kryoSerializer = new KryoSerializer();
+        RpcRequest request = new RpcRequest("7aa332c7-f0f8-40a7-baa3-efa5baa8cb6a", "com.lzb.HelloService", "hello"
+                , new String[]{"111", "222"}, new Class[]{RpcRequest.class});
+        byte[] serialize = kryoSerializer.serialize(request);
+        System.out.println(Arrays.toString(serialize));
+        System.out.println(serialize.length);
+        RpcRequest deserialize = kryoSerializer.deserialize(serialize, RpcRequest.class);
+        System.out.println(deserialize);
+    }
 }

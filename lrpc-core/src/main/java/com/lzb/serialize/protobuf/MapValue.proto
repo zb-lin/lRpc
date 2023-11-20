@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package com.lzb.serialize.protobuf;
+
+option java_package = "com.lzb.serialize.protobuf";
+option java_multiple_files = false;
+
+message Map{
+    map<string,string> attachments = 1;
+}

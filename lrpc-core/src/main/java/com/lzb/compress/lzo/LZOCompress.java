@@ -1,32 +1,29 @@
-package com.lzb.compress.gzip;
+package com.lzb.compress.lzo;
 
 
 import com.lzb.compress.Compress;
-import com.lzb.compress.deflate.DeflateCompress;
 import com.lzb.exception.RpcException;
+import org.anarres.lzo.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 
-public class GzipCompress implements Compress {
+public class LZOCompress implements Compress {
 
-
-    private static final int BUFFER_SIZE = 1024 * 4;
 
     @Override
     public byte[] compress(byte[] bytes) {
         if (bytes == null) {
             throw new NullPointerException("bytes is null");
         }
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             GZIPOutputStream gzip = new GZIPOutputStream(out)) {
-            gzip.write(bytes);
-            gzip.flush();
-            gzip.finish();
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            LzoCompressor compressor = LzoLibrary.getInstance().newCompressor(
+                    LzoAlgorithm.LZO1X, null);
+            LzoOutputStream lzoOutputStream = new LzoOutputStream(out, compressor);
+            lzoOutputStream.write(bytes);
+            lzoOutputStream.close();
             return out.toByteArray();
         } catch (IOException e) {
             throw new RpcException("gzip compress failed", e);
@@ -39,11 +36,14 @@ public class GzipCompress implements Compress {
             throw new NullPointerException("bytes is null");
         }
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             GZIPInputStream gunzip = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int n;
-            while ((n = gunzip.read(buffer)) > -1) {
-                out.write(buffer, 0, n);
+             ByteArrayInputStream in = new ByteArrayInputStream(bytes)) {
+            LzoDecompressor decompressor = LzoLibrary.getInstance()
+                    .newDecompressor(LzoAlgorithm.LZO1X, null);
+            LzoInputStream lzoInputStream = new LzoInputStream(in, decompressor);
+            int count;
+            byte[] buffer = new byte[2048];
+            while ((count = lzoInputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, count);
             }
             return out.toByteArray();
         } catch (IOException e) {
@@ -58,10 +58,10 @@ public class GzipCompress implements Compress {
                 -79, 1, 50, 50, -78, 1, 55, 97, 97, 51, 51, 50, 99, 55, 45, 102, 48, 102, 56, 45, 52, 48,
                 97, 55, 45, 98, 97, 97, 51, 45, 101, 102, 97, 53, 98, 97, 97, 56, 99, 98, 54, -31};
         System.out.println(bytes.length);
-        GzipCompress gzipCompress = new GzipCompress();
-        byte[] compress = gzipCompress.compress(bytes);
+        LZOCompress lzoCompress = new LZOCompress();
+        byte[] compress = lzoCompress.compress(bytes);
         System.out.println(compress.length);
-        byte[] decompress = gzipCompress.decompress(compress);
+        byte[] decompress = lzoCompress.decompress(compress);
         System.out.println(decompress.length);
     }
 }

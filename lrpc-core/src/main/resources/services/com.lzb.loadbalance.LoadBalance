@@ -1,1 +1,4 @@
-loadBalance=com.lzb.loadbalance.loadbalancer.ConsistentHashLoadBalance
+consistentHash=com.lzb.loadbalance.consistenthash.ConsistentHashLoadBalance
+p2c=com.lzb.loadbalance.p2c.P2CLoadBalancer
+random=com.lzb.loadbalance.random.RandomLoadBalance
+roundRobin=com.lzb.loadbalance.roundrobin.RoundRobinLoadBalance

@@ -1,4 +1,4 @@
-package com.lzb.loadbalance.loadbalancer;
+package com.lzb.loadbalance.random;
 
 
 import com.lzb.loadbalance.AbstractLoadBalance;
@@ -8,10 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Implementation of random load balancing strategy
- *
- * @author shuang.kou
- * @createTime 2020年06月21日 07:47:00
+ * 随机
  */
 public class RandomLoadBalance extends AbstractLoadBalance {
     @Override

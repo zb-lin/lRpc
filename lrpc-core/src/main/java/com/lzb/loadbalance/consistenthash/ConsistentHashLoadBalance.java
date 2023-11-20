@@ -1,4 +1,4 @@
-package com.lzb.loadbalance.loadbalancer;
+package com.lzb.loadbalance.consistenthash;
 
 import com.lzb.loadbalance.AbstractLoadBalance;
 import com.lzb.remoting.dto.RpcRequest;
@@ -14,8 +14,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * refer to dubbo consistent hash load balance: https://github.com/apache/dubbo/blob/2d9583adf26a2d8bd6fb646243a9fe80a77e65d5/dubbo-cluster/src/main/java/org/apache/dubbo/rpc/cluster/loadbalance/ConsistentHashLoadBalance.java
- *
+ * 一致性hash
  */
 @Slf4j
 public class ConsistentHashLoadBalance extends AbstractLoadBalance {
@@ -24,10 +23,8 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
     @Override
     protected String doSelect(List<String> serviceAddresses, RpcRequest rpcRequest) {
         int identityHashCode = System.identityHashCode(serviceAddresses);
-        // build rpc service name by rpcRequest
         String rpcServiceName = rpcRequest.getRpcServiceName();
         ConsistentHashSelector selector = selectors.get(rpcServiceName);
-        // check for updates
         if (selector == null || selector.identityHashCode != identityHashCode) {
             selectors.put(rpcServiceName, new ConsistentHashSelector(serviceAddresses, 160, identityHashCode));
             selector = selectors.get(rpcServiceName);
@@ -35,7 +32,7 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
         return selector.select(rpcServiceName + Arrays.stream(rpcRequest.getParameters()));
     }
 
-    static class ConsistentHashSelector {
+    private static final class ConsistentHashSelector {
         private final TreeMap<Long, String> virtualInvokers;
 
         private final int identityHashCode;
@@ -43,7 +40,6 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
         ConsistentHashSelector(List<String> invokers, int replicaNumber, int identityHashCode) {
             this.virtualInvokers = new TreeMap<>();
             this.identityHashCode = identityHashCode;
-
             for (String invoker : invokers) {
                 for (int i = 0; i < replicaNumber / 4; i++) {
                     byte[] digest = md5(invoker + i);
@@ -53,6 +49,28 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
                     }
                 }
             }
+        }
+
+        public String select(String rpcServiceKey) {
+            byte[] digest = md5(rpcServiceKey);
+            return selectForKey(hash(digest, 0));
+        }
+
+        public String selectForKey(long hashCode) {
+            Map.Entry<Long, String> entry = virtualInvokers.tailMap(hashCode, true).firstEntry();
+            if (entry == null) {
+                entry = virtualInvokers.firstEntry();
+            }
+            return entry.getValue();
+        }
+
+
+        private long hash(byte[] digest, int idx) {
+            return (((long) (digest[3 + idx * 4] & 0xFF) << 24)
+                    | ((long) (digest[2 + idx * 4] & 0xFF) << 16)
+                    | ((long) (digest[1 + idx * 4] & 0xFF) << 8)
+                    | (digest[idx * 4] & 0xFF))
+                    & 0xFFFFFFFFL;
         }
 
         static byte[] md5(String key) {
@@ -66,25 +84,6 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
             }
 
             return md.digest();
-        }
-
-        static long hash(byte[] digest, int idx) {
-            return ((long) (digest[3 + idx * 4] & 255) << 24 | (long) (digest[2 + idx * 4] & 255) << 16 | (long) (digest[1 + idx * 4] & 255) << 8 | (long) (digest[idx * 4] & 255)) & 4294967295L;
-        }
-
-        public String select(String rpcServiceKey) {
-            byte[] digest = md5(rpcServiceKey);
-            return selectForKey(hash(digest, 0));
-        }
-
-        public String selectForKey(long hashCode) {
-            Map.Entry<Long, String> entry = virtualInvokers.tailMap(hashCode, true).firstEntry();
-
-            if (entry == null) {
-                entry = virtualInvokers.firstEntry();
-            }
-
-            return entry.getValue();
         }
     }
 }

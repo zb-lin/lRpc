@@ -2,13 +2,14 @@ package com.lzb.remoting.codec;
 
 
 import com.lzb.compress.Compress;
+import com.lzb.config.RpcConfig;
 import com.lzb.enums.CompressEnum;
 import com.lzb.enums.RpcMessageTypeEnum;
 import com.lzb.enums.SerializationEnum;
-import com.lzb.serviceloader.ServiceLoader;
 import com.lzb.remoting.constants.RpcConstants;
 import com.lzb.remoting.dto.RpcMessage;
 import com.lzb.serialize.Serializer;
+import com.lzb.serviceloader.ServiceLoader;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -34,7 +35,7 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
             byte messageType = rpcMessage.getMessageType();
             out.writeByte(messageType);
             out.writeByte(rpcMessage.getCodec());
-            out.writeByte(CompressEnum.GZIP.getCode());
+            out.writeByte(rpcMessage.getCompress());
             out.writeInt(ATOMIC_INTEGER.getAndIncrement());
             // build full length
             byte[] bodyBytes = null;

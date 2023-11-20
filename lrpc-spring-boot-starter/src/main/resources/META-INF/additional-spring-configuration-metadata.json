@@ -23,12 +23,12 @@
     {
       "name": "lrpc.config.serialization",
       "type": "java.lang.String",
-      "defaultValue": "hessian"
+      "defaultValue": "kyro"
     },
     {
       "name": "lrpc.config.compress",
       "type": "java.lang.String",
-      "defaultValue": "gzip"
+      "defaultValue": "snappy"
     },
     {
       "name": "lrpc.config.loadBalance",

@@ -2,6 +2,7 @@ package com.lzb;
 
 import com.lzb.config.RpcConfig;
 import com.lzb.enums.*;
+import com.lzb.exception.RpcException;
 import com.lzb.utils.StringUtil;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -42,6 +43,10 @@ public class LRpcConfig {
         }
         if (StringUtil.isNotBlank(registryPort)) {
             rpcConfig.setRegistryHost(registryPort);
+        }
+        if (!(rpcConfig.getServiceDiscovery().equals(rpcConfig.getServiceProvider())
+                && rpcConfig.getServiceDiscovery().equals(rpcConfig.getServiceRegistry()))) {
+            throw new RpcException("Service registration, service discovery, and service provision are not the same implementation");
         }
     }
 

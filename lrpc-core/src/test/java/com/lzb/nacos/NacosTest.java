@@ -5,16 +5,40 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NacosTest {
 
+    public static int[] countBits(int n) {
+        int[] nums = new int[n + 1];
+        for(int i = 0; i <= n; ++i) {
+            nums[i] = count(i);
+
+        }
+        return nums;
+    }
+    public static int count(int n) {
+        int count = 0;
+        while(n > 1) {
+            if(n % 2 == 1) {
+                count++;
+            }
+            n /= 2;
+        }
+        if(n == 1) {
+            count++;
+        }
+        return count;
+    }
 
     public static void main(String[] args) {
-        String s = "NacosInetAddress(host=10.33.91.150, port=9998)";
+
+        countBits(5);
+
+        /*String s = "NacosInetAddress(host=10.33.91.150, port=9998)";
         s = s.substring(s.indexOf("(") + 1, s.length() - 1);
         System.out.println(s);
         String[] strings = s.split(",");
         String host = strings[0].split("=")[1];
         String post = strings[1].split("=")[1];
         System.out.println(host + "  " + post);
-
+*/
 
 
         /*Gson GSON = new Gson();

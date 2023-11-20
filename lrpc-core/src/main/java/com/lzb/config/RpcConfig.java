@@ -34,15 +34,15 @@ public class RpcConfig {
     /**
      * 默认 Serialization
      */
-    private static final String DEFAULT_SERIALIZATION_TYPE = SerializationEnum.HESSIAN.getName();
+    private static final String DEFAULT_SERIALIZATION_TYPE = SerializationEnum.KYRO.getName();
     /**
      * 默认 Compress
      */
-    private static final String DEFAULT_COMPRESS_TYPE = CompressEnum.GZIP.getName();
+    private static final String DEFAULT_COMPRESS_TYPE = CompressEnum.SNAPPY.getName();
     /**
      * 默认 LoadBalance
      */
-    private static final String DEFAULT_LOAD_BALANCE = LoadBalanceEnum.LOAD_BALANCE.getName();
+    private static final String DEFAULT_LOAD_BALANCE = LoadBalanceEnum.CONSISTENT_HASH.getName();
 
     private RpcConfig() {
         rpcClient = DEFAULT_RPC_CLIENT;

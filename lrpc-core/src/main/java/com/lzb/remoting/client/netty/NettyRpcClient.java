@@ -1,6 +1,7 @@
 package com.lzb.remoting.client.netty;
 
 
+import com.lzb.config.RpcConfig;
 import com.lzb.enums.CompressEnum;
 import com.lzb.enums.RpcMessageTypeEnum;
 import com.lzb.enums.SerializationEnum;
@@ -15,7 +16,6 @@ import com.lzb.remoting.dto.RpcMessage;
 import com.lzb.remoting.dto.RpcRequest;
 import com.lzb.remoting.dto.RpcResponse;
 import com.lzb.serviceloader.ServiceLoader;
-import com.lzb.config.RpcConfig;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -77,9 +77,9 @@ public final class NettyRpcClient implements RpcClient {
             unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture);
             RpcMessage rpcMessage = RpcMessage.builder().data(rpcRequest)
                     // 序列化
-                    .codec(SerializationEnum.HESSIAN.getCode())
+                    .codec(SerializationEnum.getCode(RpcConfig.getRpcConfig().getSerialization()))
                     // 压缩
-                    .compress(CompressEnum.GZIP.getCode())
+                    .compress(CompressEnum.getCode(RpcConfig.getRpcConfig().getCompress()))
                     // 请求类型
                     .messageType(RpcMessageTypeEnum.REQUEST_TYPE.getCode())
                     .build();

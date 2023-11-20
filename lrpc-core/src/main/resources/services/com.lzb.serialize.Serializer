@@ -1,3 +1,5 @@
 kyro=com.lzb.serialize.kyro.KryoSerializer
 protostuff=com.lzb.serialize.protostuff.ProtostuffSerializer
 hessian=com.lzb.serialize.hessian.HessianSerializer
+fts=com.lzb.serialize.fts.FTSSerializer
+protobuf=com.lzb.serialize.protobuf.ProtobufSerializer

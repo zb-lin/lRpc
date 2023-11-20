@@ -8,9 +8,13 @@ import lombok.Getter;
 @Getter
 public enum LoadBalanceEnum {
 
-    LOAD_BALANCE("loadBalance");
+    CONSISTENT_HASH("consistentHash"),
+    P2C("p2c"),
+    RANDOM("random"),
+    ROUND_ROBIN("roundRobin");
 
     private final String name;
+
     public static Boolean contains(String value) {
         for (LoadBalanceEnum v : values()) {
             if (v.getName().equals(value)) {

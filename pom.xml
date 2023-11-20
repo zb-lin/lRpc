@@ -12,7 +12,7 @@
         <module>lrpc-common</module>
         <module>lrpc-core</module>
         <module>example-client</module>
-        <module>hello-service-api</module>
+        <module>service-api</module>
         <module>example-server</module>
     </modules>
     <properties>
@@ -36,6 +36,10 @@
         <protostuff.version>1.7.2</protostuff.version>
         <!--hessian-->
         <hessian.version>4.0.65</hessian.version>
+        <protobuf.version>3.16.3</protobuf.version>
+        <bzip2.version>1.12</bzip2.version>
+        <lzo.version>1.0.5</lzo.version>
+        <snappy.version>1.1.2.6</snappy.version>
     </properties>
 
     <dependencies>

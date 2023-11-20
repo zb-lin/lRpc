@@ -1,1 +1,5 @@
+bzip2=com.lzb.compress.bzip2.Bzip2Compress
+deflate=com.lzb.compress.deflate.DeflateCompress
 gzip=com.lzb.compress.gzip.GzipCompress
+lzo=com.lzb.compress.lzo.LZOCompress
+snappy=com.lzb.compress.snappy.SnappyCompress

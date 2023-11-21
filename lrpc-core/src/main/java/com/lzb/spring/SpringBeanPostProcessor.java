@@ -2,14 +2,16 @@ package com.lzb.spring;
 
 import com.lzb.annotation.RpcReference;
 import com.lzb.annotation.RpcService;
+import com.lzb.config.RpcConfig;
 import com.lzb.config.RpcServiceConfig;
 import com.lzb.provider.ServiceProvider;
 import com.lzb.proxy.RpcClientProxy;
 import com.lzb.registry.nacos.util.NacosUtils;
 import com.lzb.remoting.client.RpcClient;
 import com.lzb.serviceloader.ServiceLoader;
-import com.lzb.config.RpcConfig;
 import com.lzb.threadpool.ThreadPoolFactory;
+import com.lzb.transaction.annotation.GlobalTransaction;
+import com.lzb.transaction.proxy.TransactionProxy;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -60,6 +63,13 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> targetClass = bean.getClass();
+        for (Method method : targetClass.getMethods()) {
+            if (method.isAnnotationPresent(GlobalTransaction.class)) {
+                TransactionProxy transactionProxy = new TransactionProxy();
+                bean =  transactionProxy.getProxy(targetClass);
+                break;
+            }
+        }
         Field[] declaredFields = targetClass.getDeclaredFields();
         for (Field field : declaredFields) {
             RpcReference rpcReference = field.getAnnotation(RpcReference.class);

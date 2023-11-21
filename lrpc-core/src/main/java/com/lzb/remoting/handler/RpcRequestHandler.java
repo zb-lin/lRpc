@@ -7,10 +7,19 @@ import com.lzb.flowcontrol.FlowControl;
 import com.lzb.provider.ServiceProvider;
 import com.lzb.remoting.dto.RpcRequest;
 import com.lzb.serviceloader.ServiceLoader;
+import com.lzb.threadpool.ThreadPoolFactory;
+import com.lzb.transaction.database.config.RequestStatusEnum;
+import com.lzb.transaction.database.pool.DefaultDataSource;
+import com.lzb.transaction.database.util.JDBCUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * rpc 方法执行器
@@ -20,6 +29,8 @@ public class RpcRequestHandler {
     private final ServiceProvider serviceProvider;
     private final FlowControl flowControl;
     private final RpcConfig rpcConfig = RpcConfig.getRpcConfig();
+    private final DefaultDataSource defaultDataSource = DefaultDataSource.getDefaultDataSource();
+    private final ExecutorService threadPool = ThreadPoolFactory.createThreadPool("handle-service");
 
     public RpcRequestHandler() {
         serviceProvider = ServiceLoader.getServiceLoader(ServiceProvider.class).getService(rpcConfig.getServiceProvider());
@@ -30,6 +41,52 @@ public class RpcRequestHandler {
      * 执行目标方法
      */
     public Object handle(RpcRequest rpcRequest) {
+        try {
+            Connection connection = defaultDataSource.getConnection();
+            connection.setAutoCommit(false);
+            log.info("server start transaction");
+            Object result = null;
+            try {
+                result = execute(rpcRequest);
+                // 正常执行, 先返回结果, 异步提交
+                CompletableFuture.runAsync(() -> {
+                    int status;
+                    // 轮询日志表, 出现error或success退出
+                    while ((status = JDBCUtils.queryResult(rpcRequest.getRequestId())) == RequestStatusEnum.PROCESSING.getStatus()) {
+                        try {
+                            TimeUnit.SECONDS.sleep(3);
+                        } catch (InterruptedException e) {
+                            throw new RpcException("database handler error", e);
+                        }
+                    }
+                    try {
+                        // 调用方成功, 远程提交
+                        if (status == RequestStatusEnum.SUCCESS.getStatus()) {
+                            connection.commit();
+                        } else if (status == RequestStatusEnum.ERROR.getStatus()) {
+                            // 其他出现异常, 进行回滚
+                            connection.rollback();
+                        }
+                    } catch (SQLException e) {
+                        throw new RpcException("database handler error", e);
+                    }
+                }, threadPool);
+                log.info("server end transaction");
+            } catch (Exception e) {
+                // 出现异常, 修改为error, 全部回滚
+                connection.rollback();
+                JDBCUtils.update(e.getMessage(), e.getMessage(), RequestStatusEnum.ERROR.getStatus(), rpcRequest.getRequestId());
+                log.info("handler failed", e);
+            } finally {
+                defaultDataSource.closeConnection();
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new RpcException("database handler error", e);
+        }
+    }
+
+    public Object execute(RpcRequest rpcRequest) {
         String rpcServiceName = rpcRequest.getRpcServiceName();
         String methodName = rpcRequest.getMethodName();
         Object service = serviceProvider.getService(rpcServiceName);

@@ -8,6 +8,7 @@ import com.lzb.remoting.client.RpcClient;
 import com.lzb.remoting.client.netty.NettyRpcClient;
 import com.lzb.remoting.dto.RpcRequest;
 import com.lzb.remoting.dto.RpcResponse;
+import com.lzb.transaction.database.config.RequestContext;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.proxy.Enhancer;
@@ -49,8 +50,9 @@ public class RpcClientProxy implements MethodInterceptor {
     @Override
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
         log.info("执行方法: [{}]", method.getName());
+        RequestContext requestContext = RequestContext.getInstance();
         RpcRequest rpcRequest = RpcRequest.builder()
-                .requestId(UUID.randomUUID().toString())
+                .requestId(requestContext.getContext())
                 .interfaceName(method.getDeclaringClass().getName())
                 .methodName(method.getName())
                 .parameters(objects)

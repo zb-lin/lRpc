@@ -32,7 +32,12 @@ public class LRpcConfig {
     private String failureStrategy;
     private String registryHost;
     private String registryPort;
-
+    private String driver;
+    private String url;
+    private String username;
+    private String password;
+    private String poolMinSize;
+    private String poolMaxSize;
     @PostConstruct
     public void updateConfiguration() {
         updateConfiguration(rpcClient, RpcClientEnum.class);
@@ -53,6 +58,24 @@ public class LRpcConfig {
         }
         if (StringUtil.isNotBlank(qps)) {
             rpcConfig.setQps(qps);
+        }
+        if (StringUtil.isNotBlank(driver)) {
+            rpcConfig.setDriver(driver);
+        }
+        if (StringUtil.isNotBlank(url)) {
+            rpcConfig.setUrl(url);
+        }
+        if (StringUtil.isNotBlank(username)) {
+            rpcConfig.setUsername(username);
+        }
+        if (StringUtil.isNotBlank(password)) {
+            rpcConfig.setPassword(password);
+        }
+        if (StringUtil.isNotBlank(poolMinSize)) {
+            rpcConfig.setPoolMinSize(poolMinSize);
+        }
+        if (StringUtil.isNotBlank(poolMaxSize)) {
+            rpcConfig.setPoolMaxSize(poolMaxSize);
         }
         if (!(rpcConfig.getServiceDiscovery().equals(rpcConfig.getServiceProvider())
                 && rpcConfig.getServiceDiscovery().equals(rpcConfig.getServiceRegistry()))) {

@@ -52,6 +52,14 @@ public class RpcConfig {
      * 默认 flowControl
      */
     private static final String DEFAULT_FLOW_CONTROL = FlowControlEnum.TOKEN_BUCKET.getName();
+    /**
+     * 默认 flowControl
+     */
+    private static final String DEFAULT_POOL_MIN_SIZE = "10";
+    /**
+     * 默认 flowControl
+     */
+    private static final String DEFAULT_POOL_MAX_SIZE = "100";
 
     private RpcConfig() {
         rpcClient = DEFAULT_RPC_CLIENT;
@@ -63,6 +71,8 @@ public class RpcConfig {
         loadBalance = DEFAULT_LOAD_BALANCE;
         failureStrategy = DEFAULT_FAILURE_STRATEGY;
         flowControl = DEFAULT_FLOW_CONTROL;
+        poolMinSize = DEFAULT_POOL_MIN_SIZE;
+        poolMaxSize = DEFAULT_POOL_MAX_SIZE;
     }
 
     private String rpcClient;
@@ -77,4 +87,10 @@ public class RpcConfig {
     private String failureStrategy;
     private String registryHost;
     private String registryPort;
+    private String driver;
+    private String url;
+    private String username;
+    private String password;
+    private String poolMinSize;
+    private String poolMaxSize;
 }

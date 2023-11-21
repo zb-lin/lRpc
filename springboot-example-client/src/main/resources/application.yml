@@ -7,5 +7,7 @@ lrpc:
     serialization: kyro
     compress: snappy
     loadBalance: consistentHash
+    flowControl: tokenBucket
+    qps: 10.0
+    failureStrategy: wait
     registryHost: 39.105.219.181
-

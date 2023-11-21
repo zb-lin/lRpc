@@ -4,10 +4,7 @@ import lombok.*;
 
 import java.io.Serializable;
 
-/**
- * @author shuang.kou
- * @createTime 2020年05月10日 07:04:00
- */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -15,6 +12,7 @@ import java.io.Serializable;
 @Builder
 @ToString
 public class Hello implements Serializable {
+    private static final long serialVersionUID = 197223949245791676L;
     private String message;
     private String description;
 }

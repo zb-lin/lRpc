@@ -6,6 +6,7 @@ import com.lzb.exception.RpcException;
 import com.lzb.utils.StringUtil;
 import lombok.Data;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import java.lang.reflect.Method;
 @ConfigurationProperties("lrpc.config")
 @Data
 @ComponentScan
+@Slf4j
 public class LRpcConfig {
     private String rpcClient;
     private String serviceRegistry;
@@ -25,6 +27,9 @@ public class LRpcConfig {
     private String serialization;
     private String compress;
     private String loadBalance;
+    private String flowControl;
+    private String qps;
+    private String failureStrategy;
     private String registryHost;
     private String registryPort;
 
@@ -37,12 +42,17 @@ public class LRpcConfig {
         updateConfiguration(serialization, SerializationEnum.class);
         updateConfiguration(compress, CompressEnum.class);
         updateConfiguration(loadBalance, LoadBalanceEnum.class);
+        updateConfiguration(flowControl, FlowControlEnum.class);
+        updateConfiguration(failureStrategy, FailureStrategyEnum.class);
         RpcConfig rpcConfig = RpcConfig.getRpcConfig();
         if (StringUtil.isNotBlank(registryHost)) {
             rpcConfig.setRegistryHost(registryHost);
         }
         if (StringUtil.isNotBlank(registryPort)) {
             rpcConfig.setRegistryHost(registryPort);
+        }
+        if (StringUtil.isNotBlank(qps)) {
+            rpcConfig.setQps(qps);
         }
         if (!(rpcConfig.getServiceDiscovery().equals(rpcConfig.getServiceProvider())
                 && rpcConfig.getServiceDiscovery().equals(rpcConfig.getServiceRegistry()))) {
@@ -61,6 +71,9 @@ public class LRpcConfig {
             Method rpcConfigMethod = RpcConfig.class.getMethod(methodName, String.class);
             RpcConfig rpcConfig = RpcConfig.getRpcConfig();
             rpcConfigMethod.invoke(rpcConfig, value);
+        }
+        if (!result) {
+            log.error("error service: [{}] [{}]", enumClass.getSimpleName(), value);
         }
     }
 

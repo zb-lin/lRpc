@@ -30,33 +30,28 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
         try {
             out.writeBytes(RpcConstants.MAGIC_NUMBER);
             out.writeByte(RpcConstants.VERSION);
-            // leave a place to write the value of full length
             out.writerIndex(out.writerIndex() + 4);
             byte messageType = rpcMessage.getMessageType();
             out.writeByte(messageType);
             out.writeByte(rpcMessage.getCodec());
             out.writeByte(rpcMessage.getCompress());
             out.writeInt(ATOMIC_INTEGER.getAndIncrement());
-            // build full length
             byte[] bodyBytes = null;
             int fullLength = RpcConstants.HEAD_LENGTH;
-            // if messageType is not heartbeat message,fullLength = head length + body length
             if (messageType != RpcMessageTypeEnum.HEARTBEAT_REQUEST_TYPE.getCode()
                     && messageType != RpcMessageTypeEnum.HEARTBEAT_RESPONSE_TYPE.getCode()) {
-                // serialize the object
                 String codecName = SerializationEnum.getName(rpcMessage.getCodec());
-                log.info("codec name: [{}] ", codecName);
+                log.info("serialization name: [{}] ", codecName);
                 Serializer serializer = ServiceLoader.getServiceLoader(Serializer.class)
                         .getService(codecName);
                 bodyBytes = serializer.serialize(rpcMessage.getData());
-                // compress the bytes
                 String compressName = CompressEnum.getName(rpcMessage.getCompress());
+                log.info("compress name: [{}] ", compressName);
                 Compress compress = ServiceLoader.getServiceLoader(Compress.class)
                         .getService(compressName);
                 bodyBytes = compress.compress(bodyBytes);
                 fullLength += bodyBytes.length;
             }
-
             if (bodyBytes != null) {
                 out.writeBytes(bodyBytes);
             }

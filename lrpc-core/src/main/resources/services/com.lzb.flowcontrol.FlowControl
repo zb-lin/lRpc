@@ -1,0 +1,2 @@
+tokenBucket=com.lzb.flowcontrol.tokenbucket.TokenBucketFlowControl
+sentinel=com.lzb.flowcontrol.sentinel.SentinelFlowControl

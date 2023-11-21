@@ -44,6 +44,15 @@ public class RpcConfig {
      */
     private static final String DEFAULT_LOAD_BALANCE = LoadBalanceEnum.CONSISTENT_HASH.getName();
 
+    /**
+     * 默认 failureStrategy
+     */
+    private static final String DEFAULT_FAILURE_STRATEGY = FailureStrategyEnum.WAIT.getName();
+    /**
+     * 默认 flowControl
+     */
+    private static final String DEFAULT_FLOW_CONTROL = FlowControlEnum.TOKEN_BUCKET.getName();
+
     private RpcConfig() {
         rpcClient = DEFAULT_RPC_CLIENT;
         serviceRegistry = DEFAULT_SERVICE_REGISTRY;
@@ -52,6 +61,8 @@ public class RpcConfig {
         serialization = DEFAULT_SERIALIZATION_TYPE;
         compress = DEFAULT_COMPRESS_TYPE;
         loadBalance = DEFAULT_LOAD_BALANCE;
+        failureStrategy = DEFAULT_FAILURE_STRATEGY;
+        flowControl = DEFAULT_FLOW_CONTROL;
     }
 
     private String rpcClient;
@@ -61,6 +72,9 @@ public class RpcConfig {
     private String serialization;
     private String compress;
     private String loadBalance;
+    private String flowControl;
+    private String qps;
+    private String failureStrategy;
     private String registryHost;
     private String registryPort;
 }

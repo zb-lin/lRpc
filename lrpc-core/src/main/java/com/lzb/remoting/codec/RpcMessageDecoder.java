@@ -4,12 +4,12 @@ import com.lzb.compress.Compress;
 import com.lzb.enums.CompressEnum;
 import com.lzb.enums.RpcMessageTypeEnum;
 import com.lzb.enums.SerializationEnum;
-import com.lzb.serviceloader.ServiceLoader;
 import com.lzb.remoting.constants.RpcConstants;
 import com.lzb.remoting.dto.RpcMessage;
 import com.lzb.remoting.dto.RpcRequest;
 import com.lzb.remoting.dto.RpcResponse;
 import com.lzb.serialize.Serializer;
+import com.lzb.serviceloader.ServiceLoader;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -31,14 +31,11 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
     /**
-     * @param maxFrameLength      Maximum frame length. It decide the maximum length of data that can be received.
-     *                            If it exceeds, the data will be discarded.
-     * @param lengthFieldOffset   Length field offset. The length field is the one that skips the specified length of byte.
-     * @param lengthFieldLength   The number of bytes in the length field.
-     * @param lengthAdjustment    The compensation value to add to the value of the length field
-     * @param initialBytesToStrip Number of bytes skipped.
-     *                            If you need to receive all of the header+body data, this value is 0
-     *                            if you only want to receive the body data, then you need to skip the number of bytes consumed by the header.
+     * @param maxFrameLength      最大帧长度。它决定可以接收的数据的最大长度。如果超过，数据将被丢弃。
+     * @param lengthFieldOffset   长度字段偏移。长度字段是跳过指定字节长度的字段。
+     * @param lengthFieldLength   长度字段中的字节数。
+     * @param lengthAdjustment    要添加到长度字段值的补偿值
+     * @param initialBytesToStrip 跳过的字节数。如果您需要接收所有标头+正文数据，如果您只想接收正文数据，则此值为0，则需要跳过标头消耗的字节数。
      */
     public RpcMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength,
                              int lengthAdjustment, int initialBytesToStrip) {
@@ -60,18 +57,15 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
                     frame.release();
                 }
             }
-
         }
         return decoded;
     }
 
 
     private Object decodeFrame(ByteBuf in) {
-        // note: must read ByteBuf in order
         checkMagicNumber(in);
         checkVersion(in);
         int fullLength = in.readInt();
-        // build RpcMessage object
         byte messageType = in.readByte();
         byte codecType = in.readByte();
         byte compressType = in.readByte();
@@ -92,14 +86,13 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         if (bodyLength > 0) {
             byte[] bs = new byte[bodyLength];
             in.readBytes(bs);
-            // decompress the bytes
             String compressName = CompressEnum.getName(compressType);
             Compress compress = ServiceLoader.getServiceLoader(Compress.class)
                     .getService(compressName);
+            log.info("compress name: [{}] ", compressName);
             bs = compress.decompress(bs);
-            // deserialize the object
             String codecName = SerializationEnum.getName(rpcMessage.getCodec());
-            log.info("codec name: [{}] ", codecName);
+            log.info("serialization name: [{}] ", codecName);
             Serializer serializer = ServiceLoader.getServiceLoader(Serializer.class)
                     .getService(codecName);
             if (messageType == RpcMessageTypeEnum.REQUEST_TYPE.getCode()) {
@@ -111,7 +104,6 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
             }
         }
         return rpcMessage;
-
     }
 
     private void checkVersion(ByteBuf in) {
@@ -133,5 +125,4 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
             }
         }
     }
-
 }
